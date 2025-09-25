@@ -58,7 +58,7 @@ export class CadastroAluno {
     this.salvarLocalStorage();
     this.router.navigate(["/alunos"]);
 
-  }
+  } 
 
   salvarLocalStorage(): void {
     let alunosString = JSON.stringify(this.alunos);
