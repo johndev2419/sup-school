@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import {  ActivatedRoute, Router } from '@angular/router';
 
 interface Aluno {
   id: string
@@ -31,17 +31,53 @@ export class CadastroAluno {
   nota2?: number;
   nota3?: number;
   frequencia?: number;
+  idEditar?: string;
 
-  constructor(private router: Router){
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+  ){
     this.alunos = this.carregarAlunosLocalStorage();
-  }
+    let idParaEditar = this.activatedRoute.snapshot.paramMap.get("id");
+    // se o idParaEditar for diferente de null,que dizer o id está definido na url  
+    if(idParaEditar !== null) {
 
+      this.idEditar = idParaEditar.toString();
+
+
+      this.preencherCamposParaEditar();
+    }
+  }
   //Métodos
   salvar(): void {
-    //variável local
     let media = this.calcularMedia();
     let status = this.descobrirStatus(media);
-    
+
+    if(this.idEditar === undefined){
+      this.cadastrarAluno(media, status);
+    }else {
+      this.idEditarAluno(media,status);
+    }
+
+    this.salvarLocalStorage();
+    this.router.navigate(["/alunos"]);
+  }
+
+   
+
+  idEditarAluno(media: number, status: string): void {
+    let indicelista = this.alunos.findIndex(aluno => aluno.id === this.idEditar);
+
+    this.alunos[indicelista].nome = this.nome;
+    this.alunos[indicelista].nota1 = this.nota1!; 
+    this.alunos[indicelista].nota2= this.nota2!;
+    this.alunos[indicelista].nota3 = this.nota3!;
+    this.alunos[indicelista].media= media;
+    this.alunos[indicelista].frequencia= this.frequencia!;
+    this.alunos[indicelista].status= status;
+  }
+
+  cadastrarAluno(media: number, status: string): void{
     let aluno: Aluno = {
       id: crypto.randomUUID(),
       nome: this.nome,
@@ -51,14 +87,10 @@ export class CadastroAluno {
       frequencia: this.frequencia!,
       media: media,
       status: status
-
+     
     };
-
-    this.alunos.push(aluno);
-    this.salvarLocalStorage();
-    this.router.navigate(["/alunos"]);
-
-  } 
+    this.alunos.push(aluno) 
+  }
 
   salvarLocalStorage(): void {
     let alunosString = JSON.stringify(this.alunos);
@@ -101,4 +133,14 @@ export class CadastroAluno {
 
 
 
+  preencherCamposParaEditar(): void {
+    let aluno = this.alunos.filter(aluno => aluno.id === this.idEditar)[0];
+
+    this.nome = aluno.nome
+    this.nota1 = aluno.nota1
+    this.nota2 = aluno.nota2
+    this.nota3= aluno.nota3
+    this.frequencia = aluno.frequencia
+
+  }
 }

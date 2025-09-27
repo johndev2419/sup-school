@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 
 interface Turma {
@@ -19,7 +19,7 @@ interface Turma {
 export class ListaTurmas {
   turmas: Turma[];
 
-  constructor() {
+  constructor(private router: Router) {
     this.turmas = this.carregarTurmasLocalStorage();
   }
   salvarLocalStorage(): void {
@@ -35,6 +35,10 @@ export class ListaTurmas {
     }
     let turmas: Turma[] = JSON.parse(TurmaDoLocalStorage);
     return turmas;
+  }
+
+  editar(turma: Turma): void {
+       this.router.navigate([`/turmas/editar/${turma.id}`])
   }
 
   apagar(turmas: Turma): void {
